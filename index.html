@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Générateur de clé</title>
+</head>
+<body>
+    <h1>Votre clé</h1>
+
+    <button onclick="generateKey()">
+        Générer une clé
+    </button>
+
+    <p id="key"></p>
+
+    <script>
+        function generateKey() {
+            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            let key = "";
+
+            for (let i = 0; i < 16; i++) {
+                if (i > 0 && i % 4 === 0) key += "-";
+                key += chars[Math.floor(Math.random() * chars.length)];
+            }
+
+            document.getElementById("key").innerText = key;
+        }
+    </script>
+</body>
+</html>
