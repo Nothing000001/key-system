@@ -4,60 +4,59 @@
     <title>Key System</title>
 </head>
 <body>
-
 <h1>Générateur de clé</h1>
-
-<button onclick="createKey()">Générer une clé</button>
+<p id="status">Vérification...</p>
+<button id="genBtn" style="display:none" onclick="createKey()">Générer une clé</button>
 <p id="key"></p>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-
 <script>
 const supabaseUrl = "https://pzdodoygspssikcpvvrq.supabase.co";
 const supabaseKey = "sb_publishable_rVdhmCr_Y815IhWnOJxjCw_rZIpiX0H";
-
 const client = supabase.createClient(supabaseUrl, supabaseKey);
+
+// Vérifie si vient de work.ink
+const referrer = document.referrer;
+const allowed = referrer.includes("work.ink") || referrer.includes("loot-link.com");
+
+if (!allowed) {
+    document.getElementById("status").innerText = "❌ Tu dois passer par le lien officiel !";
+    setTimeout(function() {
+        window.location.href = "https://work.ink/2Cxd/key-systeme";
+    }, 3000);
+} else {
+    document.getElementById("status").innerText = "✅ Accès autorisé !";
+    document.getElementById("genBtn").style.display = "block";
+}
 
 function generateKey() {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let key = "";
-
     for (let i = 0; i < 16; i++) {
         if (i > 0 && i % 4 === 0) key += "-";
         key += chars[Math.floor(Math.random() * chars.length)];
     }
-
     return key;
 }
 
 async function createKey() {
     const key = generateKey();
-
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 24);
 
     const { data, error } = await client
         .from("keys")
-        .insert([
-            {
-                key: key,
-                expires_at: expiresAt.toISOString()
-            }
-        ])
+        .insert([{ key: key, expires_at: expiresAt.toISOString() }])
         .select();
-
-    console.log("DATA:", data);
-    console.log("ERROR:", error);
 
     if (error) {
         alert(error.message);
         return;
     }
 
-    document.getElementById("key").innerText =
-        "Clé : " + key + " | Expire dans 24h";
+    document.getElementById("key").innerText = "Clé : " + key + " | Expire dans 24h";
+    document.getElementById("genBtn").style.display = "none";
 }
 </script>
-
 </body>
 </html>
