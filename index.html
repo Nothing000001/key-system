@@ -36,14 +36,18 @@ async function createKey() {
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 24);
 
-    const { error } = await client
+    const { data, error } = await client
         .from("keys")
         .insert([
             {
                 key: key,
                 expires_at: expiresAt.toISOString()
             }
-        ]);
+        ])
+        .select();
+
+    console.log("DATA:", data);
+    console.log("ERROR:", error);
 
     if (error) {
         alert(error.message);
