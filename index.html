@@ -1,95 +1,495 @@
+cat > /mnt/user-data/outputs/wan_hub_key_system.html << 'EOF'
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Key System</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WAN HUB - Key System</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #0a0a0a; color: #e8e8e8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+        a { text-decoration: none; }
+
+        /* NAV */
+        .nav { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 2.5rem; border-bottom: 0.5px solid #222; position: sticky; top: 0; background: #0a0a0a; z-index: 100; }
+        .nav-logo { font-size: 18px; font-weight: 500; color: #fff; letter-spacing: -0.3px; }
+        .nav-logo span { color: #7F77DD; }
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a { font-size: 14px; color: #999; transition: color 0.2s; }
+        .nav-links a:hover { color: #fff; }
+        .nav-btn { background: #7F77DD; color: #fff; border: none; padding: 8px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; }
+        .nav-btn:hover { background: #6b63c7; }
+
+        /* HERO */
+        .hero { padding: 5rem 2.5rem 4rem; max-width: 900px; }
+        .badge { display: inline-flex; align-items: center; gap: 6px; background: #1a1a2e; border: 0.5px solid #3C3489; color: #AFA9EC; font-size: 12px; padding: 5px 12px; border-radius: 20px; margin-bottom: 2rem; }
+        .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: #7F77DD; }
+        h1 { font-size: 52px; font-weight: 500; color: #fff; line-height: 1.1; letter-spacing: -1px; margin-bottom: 1.5rem; }
+        h1 span { color: #7F77DD; }
+        .hero-sub { font-size: 17px; color: #888; line-height: 1.7; max-width: 560px; margin-bottom: 2.5rem; }
+        .hero-actions { display: flex; gap: 1rem; align-items: center; }
+        .btn-primary { background: #7F77DD; color: #fff; border: none; padding: 12px 28px; border-radius: 8px; font-size: 15px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-primary:hover { background: #6b63c7; }
+        .btn-secondary { background: transparent; color: #ccc; border: 0.5px solid #333; padding: 12px 28px; border-radius: 8px; font-size: 15px; cursor: pointer; }
+        .btn-secondary:hover { background: #111; }
+
+        /* FEATURES */
+        .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #1a1a1a; border-top: 1px solid #1a1a1a; border-bottom: 1px solid #1a1a1a; margin: 2rem 0; }
+        .feature { background: #0a0a0a; padding: 2rem 2.5rem; }
+        .feature-icon { width: 40px; height: 40px; background: #1a1a2e; border: 0.5px solid #3C3489; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; color: #7F77DD; font-size: 20px; }
+        .feature h3 { font-size: 15px; font-weight: 500; color: #fff; margin-bottom: 0.5rem; }
+        .feature p { font-size: 13px; color: #666; line-height: 1.6; }
+
+        /* HOW IT WORKS */
+        .how-it-works { padding: 4rem 2.5rem; }
+        .section-label { font-size: 12px; color: #7F77DD; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; }
+        .section-title { font-size: 32px; font-weight: 500; color: #fff; margin-bottom: 1rem; }
+        .section-sub { font-size: 15px; color: #666; max-width: 480px; margin-bottom: 3rem; line-height: 1.6; }
+        .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+        .step { background: #111; border: 0.5px solid #222; border-radius: 12px; padding: 1.5rem; position: relative; }
+        .step-num { font-size: 11px; color: #7F77DD; font-weight: 500; margin-bottom: 0.75rem; letter-spacing: 1px; }
+        .step h4 { font-size: 14px; font-weight: 500; color: #fff; margin-bottom: 0.5rem; }
+        .step p { font-size: 13px; color: #555; line-height: 1.6; }
+        .step-line { position: absolute; top: 2rem; right: -0.75rem; width: 1.5rem; height: 0.5px; background: #333; z-index: 1; }
+
+        /* SECURITY */
+        .security { padding: 4rem 2.5rem; background: #0d0d0d; border-top: 0.5px solid #1a1a1a; border-bottom: 0.5px solid #1a1a1a; }
+        .security-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; }
+        .security-list { list-style: none; display: flex; flex-direction: column; gap: 1rem; margin-top: 2rem; }
+        .security-list li { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: #888; }
+        .security-list li i { color: #7F77DD; font-size: 16px; margin-top: 2px; }
+        .code-block { background: #111; border: 0.5px solid #222; border-radius: 10px; padding: 1.5rem; font-family: 'Courier New', monospace; font-size: 12px; color: #888; line-height: 1.8; }
+        .code-block .cp { color: #AFA9EC; }
+        .code-block .cg { color: #97C459; }
+        .code-block .ca { color: #EF9F27; }
+        .code-block .cc { color: #555; }
+
+        /* CTA */
+        .cta { padding: 5rem 2.5rem; text-align: center; }
+        .cta h2 { font-size: 36px; font-weight: 500; color: #fff; margin-bottom: 1rem; }
+        .cta p { font-size: 15px; color: #666; margin-bottom: 2rem; }
+
+        /* FOOTER */
+        .footer { padding: 2rem 2.5rem; border-top: 0.5px solid #1a1a1a; display: flex; justify-content: space-between; align-items: center; }
+        .footer p { font-size: 12px; color: #444; }
+
+        /* KEY MODAL */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: #111; border: 0.5px solid #2a2a2a; border-radius: 16px; padding: 2.5rem; width: 100%; max-width: 480px; position: relative; }
+        .modal-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: #555; font-size: 20px; cursor: pointer; }
+        .modal-close:hover { color: #fff; }
+        .modal h2 { font-size: 22px; font-weight: 500; color: #fff; margin-bottom: 0.5rem; }
+        .modal-sub { font-size: 14px; color: #666; margin-bottom: 2rem; line-height: 1.6; }
+        .modal-status { font-size: 13px; padding: 10px 14px; border-radius: 8px; margin-bottom: 1.5rem; display: none; }
+        .modal-status.error { background: #1a0f0f; border: 0.5px solid #5A1A1A; color: #f09595; display: block; }
+        .modal-status.success { background: #0f1a0f; border: 0.5px solid #1A5A1A; color: #97C459; display: block; }
+        .modal-status.info { background: #1a1a2e; border: 0.5px solid #3C3489; color: #AFA9EC; display: block; }
+        .input-group { margin-bottom: 1rem; }
+        .input-group label { display: block; font-size: 12px; color: #666; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .input-group input { width: 100%; background: #0a0a0a; border: 0.5px solid #2a2a2a; border-radius: 8px; padding: 10px 14px; font-size: 14px; color: #fff; font-family: 'Courier New', monospace; outline: none; }
+        .input-group input:focus { border-color: #7F77DD; }
+        .input-group input::placeholder { color: #444; }
+        .modal-actions { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1.5rem; }
+        .modal-actions .btn-primary { justify-content: center; width: 100%; }
+        .modal-divider { display: flex; align-items: center; gap: 1rem; margin: 0.25rem 0; }
+        .modal-divider span { font-size: 12px; color: #444; white-space: nowrap; }
+        .modal-divider::before, .modal-divider::after { content: ''; flex: 1; height: 0.5px; background: #222; }
+        .btn-outline { background: transparent; color: #888; border: 0.5px solid #2a2a2a; padding: 10px 28px; border-radius: 8px; font-size: 14px; cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-outline:hover { background: #1a1a1a; color: #fff; }
+        .key-display { background: #0a0a0a; border: 0.5px solid #2a2a2a; border-radius: 8px; padding: 14px; font-family: 'Courier New', monospace; font-size: 18px; color: #7F77DD; text-align: center; letter-spacing: 2px; margin: 1rem 0; cursor: pointer; position: relative; }
+        .key-display:hover { border-color: #7F77DD; }
+        .key-copy-hint { font-size: 11px; color: #444; text-align: center; margin-bottom: 1rem; }
+        .timer-bar { height: 3px; background: #1a1a2e; border-radius: 2px; margin-top: 1rem; overflow: hidden; }
+        .timer-bar-fill { height: 100%; background: #7F77DD; transition: width 1s linear; border-radius: 2px; }
+
+        @media (max-width: 768px) {
+            .features { grid-template-columns: 1fr; }
+            .steps { grid-template-columns: 1fr; }
+            .security-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 32px; }
+            .nav-links { display: none; }
+        }
+    </style>
 </head>
 <body>
-    <h1>Générateur de clé</h1>
-    <p id="status">Vérification...</p>
-    <button id="genBtn" style="display:none" onclick="createKey()">Générer une clé</button>
-    <p id="key"></p>
-    <p id="timer"></p>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-    <script>
-        const supabaseUrl = "https://pzdodoygspssikcpvvrq.supabase.co";
-        const supabaseKey = "sb_publishable_rVdhmCr_Y815IhWnOJxjCw_rZIpiX0H";
-        const client = supabase.createClient(supabaseUrl, supabaseKey);
+<!-- NAVBAR -->
+<nav class="nav">
+    <div class="nav-logo">WAN<span>HUB</span></div>
+    <div class="nav-links">
+        <a href="#how-it-works">How it works</a>
+        <a href="#security">Security</a>
+        <a href="#get-key">Get a key</a>
+    </div>
+    <button class="nav-btn" onclick="openModal()">Get a key</button>
+</nav>
 
+<!-- HERO -->
+<div class="hero">
+    <div class="badge"><span class="badge-dot"></span> Secure key authentication system</div>
+    <h1>The key system<br>built for <span>serious</span><br>script creators.</h1>
+    <p class="hero-sub">WAN HUB protects your scripts with user-bound keys, 24-hour expiration, and server-side validation. No bypasses. No sharing.</p>
+    <div class="hero-actions">
+        <button class="btn-primary" onclick="openModal()"><i class="ti ti-key"></i> Get your key</button>
+        <button class="btn-secondary" onclick="document.getElementById('how-it-works').scrollIntoView({behavior:'smooth'})">See how it works</button>
+    </div>
+</div>
+
+<!-- FEATURES -->
+<div class="features">
+    <div class="feature">
+        <div class="feature-icon"><i class="ti ti-user-check"></i></div>
+        <h3>User-bound keys</h3>
+        <p>Each key is permanently tied to a single Roblox user ID. Sharing a key does nothing.</p>
+    </div>
+    <div class="feature">
+        <div class="feature-icon"><i class="ti ti-clock"></i></div>
+        <h3>24-hour expiration</h3>
+        <p>Keys automatically expire after 24 hours. Users return through the link to renew access.</p>
+    </div>
+    <div class="feature">
+        <div class="feature-icon"><i class="ti ti-shield-lock"></i></div>
+        <h3>Server-side validation</h3>
+        <p>All checks happen on a secure Supabase edge function. Nothing sensitive lives in the script.</p>
+    </div>
+    <div class="feature">
+        <div class="feature-icon"><i class="ti ti-refresh"></i></div>
+        <h3>Auto login</h3>
+        <p>Returning users with a valid key skip the UI entirely and go straight to the script.</p>
+    </div>
+    <div class="feature">
+        <div class="feature-icon"><i class="ti ti-lock-access"></i></div>
+        <h3>Access control</h3>
+        <p>The key page is gated behind a link checkpoint. Direct URL access is blocked and redirected.</p>
+    </div>
+    <div class="feature">
+        <div class="feature-icon"><i class="ti ti-database"></i></div>
+        <h3>Persistent storage</h3>
+        <p>Keys are saved locally. No need to re-enter on every session within the valid window.</p>
+    </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="how-it-works" id="how-it-works">
+    <div class="section-label">How it works</div>
+    <div class="section-title">Three steps to access.</div>
+    <p class="section-sub">From clicking the link to running the script, the entire flow takes under a minute.</p>
+    <div class="steps">
+        <div class="step">
+            <div class="step-num">STEP 01</div>
+            <h4>Pass the checkpoint</h4>
+            <p>Click the official link. Complete the short checkpoint. You are redirected to the key page.</p>
+            <div class="step-line"></div>
+        </div>
+        <div class="step">
+            <div class="step-num">STEP 02</div>
+            <h4>Generate your key</h4>
+            <p>Hit the generate button. Your key is created, bound to your account, and valid for 24 hours.</p>
+            <div class="step-line"></div>
+        </div>
+        <div class="step">
+            <div class="step-num">STEP 03</div>
+            <h4>Enter and launch</h4>
+            <p>Paste the key into the script UI. Validation runs server-side. On success, the script launches.</p>
+        </div>
+    </div>
+</div>
+
+<!-- SECURITY -->
+<div class="security" id="security">
+    <div class="security-grid">
+        <div>
+            <div class="section-label">Security model</div>
+            <div class="section-title">Built to be hard to bypass.</div>
+            <ul class="security-list">
+                <li><i class="ti ti-check"></i> Keys are validated against the Roblox user ID server-side on every use</li>
+                <li><i class="ti ti-check"></i> The first user to claim a key locks it to their account permanently</li>
+                <li><i class="ti ti-check"></i> Expired keys are rejected regardless of who holds them</li>
+                <li><i class="ti ti-check"></i> The key generation page blocks direct URL access with a referrer check</li>
+                <li><i class="ti ti-check"></i> Row-level security on the database prevents public read or modification</li>
+            </ul>
+        </div>
+        <div class="code-block">
+            <span class="cc">// server response codes</span><br><br>
+            <span class="cp">VALID</span>         <span class="cc">→</span> key accepted, script loads<br>
+            <span class="ca">ALREADY_USED</span>  <span class="cc">→</span> key claimed by another user<br>
+            <span class="ca">EXPIRED</span>       <span class="cc">→</span> key past 24h window<br>
+            <span class="cc">INVALID</span>       <span class="cc">→</span> key not found in database<br><br>
+            <span class="cc">// auto login flow</span><br><br>
+            <span class="cg">if</span> savedKey <span class="cc">+</span> VALID<br>
+            &nbsp;&nbsp;<span class="cc">→</span> skip UI, launch script<br>
+            <span class="cg">else</span><br>
+            &nbsp;&nbsp;<span class="cc">→</span> show key input UI
+        </div>
+    </div>
+</div>
+
+<!-- CTA -->
+<div class="cta" id="get-key">
+    <h2>Ready to get access?</h2>
+    <p>Pass the checkpoint to generate your key and unlock the script.</p>
+    <button class="btn-primary" onclick="openModal()"><i class="ti ti-arrow-right"></i> Get your key now</button>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <p>WAN HUB Key System</p>
+    <p>Built with Supabase edge functions</p>
+</footer>
+
+<!-- KEY MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+        <button class="modal-close" onclick="closeModal()"><i class="ti ti-x"></i></button>
+
+        <!-- VIEW: GET KEY -->
+        <div id="viewGetKey">
+            <h2>Get your key</h2>
+            <p class="modal-sub">You need to pass the checkpoint to generate a key. Each key is valid for 24 hours and bound to your account.</p>
+            <div class="modal-status info" id="statusGetKey">
+                <i class="ti ti-info-circle"></i> Keys are tied to your Roblox user ID. You cannot share them.
+            </div>
+            <div class="modal-actions">
+                <a href="https://work.ink/2Cxd/key-systeme" target="_blank" style="width:100%">
+                    <button class="btn-primary" style="width:100%; justify-content:center;"><i class="ti ti-external-link"></i> Go to checkpoint to get a key</button>
+                </a>
+                <div class="modal-divider"><span>already have a key?</span></div>
+                <button class="btn-outline" onclick="showView('viewEnterKey')"><i class="ti ti-keyboard"></i> Enter my key</button>
+            </div>
+        </div>
+
+        <!-- VIEW: ENTER KEY -->
+        <div id="viewEnterKey" style="display:none">
+            <h2>Enter your key</h2>
+            <p class="modal-sub">Paste the key you generated from the checkpoint link below.</p>
+            <div class="modal-status" id="statusEnterKey"></div>
+            <div class="input-group">
+                <label>Your key</label>
+                <input type="text" id="keyInput" placeholder="XXXX-XXXX-XXXX-XXXX" maxlength="19" oninput="formatKeyInput(this)" />
+            </div>
+            <div class="modal-actions">
+                <button class="btn-primary" onclick="verifyKey()"><i class="ti ti-shield-check"></i> Verify key</button>
+                <button class="btn-outline" onclick="showView('viewGetKey')"><i class="ti ti-arrow-left"></i> Back</button>
+            </div>
+        </div>
+
+        <!-- VIEW: KEY VALID -->
+        <div id="viewKeyValid" style="display:none">
+            <h2>Key verified</h2>
+            <p class="modal-sub">Your key is valid and has been saved. Copy it below for use in the script.</p>
+            <div class="key-display" id="keyDisplay" onclick="copyKey()" title="Click to copy"></div>
+            <p class="key-copy-hint">Click the key to copy it to clipboard</p>
+            <div class="modal-status success" id="statusValid">Key saved locally. You will not need to re-enter it for 24 hours.</div>
+            <div class="modal-actions">
+                <button class="btn-primary" onclick="closeModal()"><i class="ti ti-check"></i> Done</button>
+            </div>
+        </div>
+
+        <!-- VIEW: GENERATE KEY (from checkpoint) -->
+        <div id="viewGenerate" style="display:none">
+            <h2>Generate your key</h2>
+            <p class="modal-sub">You arrived from the checkpoint. Click below to generate your key. This page closes automatically after generation.</p>
+            <div class="modal-status" id="statusGenerate"></div>
+            <div class="timer-bar"><div class="timer-bar-fill" id="timerBar" style="width:100%"></div></div>
+            <p style="font-size:12px; color:#444; margin-top:6px;" id="timerText">5:00 remaining</p>
+            <div class="modal-actions" style="margin-top:1.5rem">
+                <button class="btn-primary" id="generateBtn" onclick="generateKey()"><i class="ti ti-key"></i> Generate my key</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const SUPABASE_URL = "https://pzdodoygspssikcpvvrq.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_rVdhmCr_Y815IhWnOJxjCw_rZIpiX0H";
+    const CHECK_URL = "https://pzdodoygspssikcpvvrq.supabase.co/functions/v1/dynamic-service";
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let generatedKey = null;
+    let timerInterval = null;
+    let timeLeft = 300;
+
+    // Check referrer on load
+    window.addEventListener('load', function() {
         const referrer = document.referrer;
-        const allowed = referrer.includes("work.ink") || referrer.includes("loot-link.com");
-        let keyGenerated = false;
+        const fromCheckpoint = referrer.includes("work.ink") || referrer.includes("loot-link.com");
+        if (fromCheckpoint) {
+            openModal();
+            showView('viewGenerate');
+            startTimer();
+        }
+    });
 
-        if (!allowed) {
-            document.getElementById("status").innerText = "❌ Tu dois passer par le lien officiel !";
-            setTimeout(function() {
-                window.location.href = "https://work.ink/2Cxd/key-systeme";
-            }, 3000);
-        } else {
-            document.getElementById("status").innerText = "✅ Accès autorisé ! Tu as 5 minutes.";
-            document.getElementById("genBtn").style.display = "block";
+    function openModal() {
+        document.getElementById('modalOverlay').classList.add('active');
+    }
 
-            let timeLeft = 300;
-            const countdown = setInterval(function() {
-                timeLeft--;
-                const min = Math.floor(timeLeft / 60);
-                const sec = timeLeft % 60;
-                document.getElementById("timer").innerText = "⏳ Temps restant : " + min + "m " + sec + "s";
+    function closeModal() {
+        document.getElementById('modalOverlay').classList.remove('active');
+        if (timerInterval) clearInterval(timerInterval);
+    }
 
-                if (timeLeft <= 0) {
-                    clearInterval(countdown);
-                    if (!keyGenerated) {
-                        document.getElementById("genBtn").style.display = "none";
-                        document.getElementById("status").innerText = "❌ Temps écoulé ! Repasse par le lien officiel.";
-                        document.getElementById("timer").innerText = "";
-                        setTimeout(function() {
-                            window.location.href = "https://work.ink/2Cxd/key-systeme";
-                        }, 3000);
-                    }
-                }
-            }, 1000);
+    function showView(viewId) {
+        ['viewGetKey','viewEnterKey','viewKeyValid','viewGenerate'].forEach(id => {
+            document.getElementById(id).style.display = 'none';
+        });
+        document.getElementById(viewId).style.display = 'block';
+    }
+
+    function formatKeyInput(input) {
+        let val = input.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+        let formatted = '';
+        for (let i = 0; i < val.length && i < 16; i++) {
+            if (i > 0 && i % 4 === 0) formatted += '-';
+            formatted += val[i];
+        }
+        input.value = formatted;
+    }
+
+    function setStatus(id, message, type) {
+        const el = document.getElementById(id);
+        el.className = 'modal-status ' + type;
+        el.innerHTML = message;
+        el.style.display = 'block';
+    }
+
+    async function verifyKey() {
+        const key = document.getElementById('keyInput').value.trim();
+        if (!key || key.length < 19) {
+            setStatus('statusEnterKey', '<i class="ti ti-alert-circle"></i> Please enter a valid key (format: XXXX-XXXX-XXXX-XXXX)', 'error');
+            return;
         }
 
-        function generateKey() {
+        setStatus('statusEnterKey', '<i class="ti ti-loader"></i> Verifying...', 'info');
+
+        // For demo: no userId available on web, use a placeholder
+        const userId = "web_" + btoa(navigator.userAgent).slice(0, 12);
+        const url = CHECK_URL + "?key=" + encodeURIComponent(key) + "&userId=" + userId;
+
+        try {
+            const res = await fetch(url);
+            const text = (await res.text()).trim().toUpperCase();
+
+            if (text === 'VALID') {
+                localStorage.setItem('wanhub_key', key);
+                localStorage.setItem('wanhub_ts', Date.now().toString());
+                document.getElementById('keyDisplay').innerText = key;
+                showView('viewKeyValid');
+            } else if (text === 'ALREADY_USED') {
+                setStatus('statusEnterKey', '<i class="ti ti-ban"></i> This key is already claimed by another user.', 'error');
+            } else if (text === 'EXPIRED') {
+                setStatus('statusEnterKey', '<i class="ti ti-clock-off"></i> This key has expired. Please generate a new one.', 'error');
+            } else {
+                setStatus('statusEnterKey', '<i class="ti ti-x"></i> Invalid key. Please check and try again.', 'error');
+            }
+        } catch (e) {
+            setStatus('statusEnterKey', '<i class="ti ti-wifi-off"></i> Network error. Please try again.', 'error');
+        }
+    }
+
+    function generateKey() {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        let key = "";
+        for (let i = 0; i < 16; i++) {
+            if (i > 0 && i % 4 === 0) key += "-";
+            key += chars[Math.floor(Math.random() * chars.length)];
+        }
+        return key;
+    }
+
+    async function generateKey() {
+        const btn = document.getElementById('generateBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="ti ti-loader"></i> Generating...';
+
+        const key = (function() {
             const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            let key = "";
+            let k = "";
             for (let i = 0; i < 16; i++) {
-                if (i > 0 && i % 4 === 0) key += "-";
-                key += chars[Math.floor(Math.random() * chars.length)];
+                if (i > 0 && i % 4 === 0) k += "-";
+                k += chars[Math.floor(Math.random() * chars.length)];
             }
-            return key;
+            return k;
+        })();
+
+        const expiresAt = new Date();
+        expiresAt.setHours(expiresAt.getHours() + 24);
+
+        const { data, error } = await client
+            .from("keys")
+            .insert([{ key: key, expires_at: expiresAt.toISOString() }])
+            .select();
+
+        if (error) {
+            setStatus('statusGenerate', '<i class="ti ti-x"></i> Error: ' + error.message, 'error');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="ti ti-key"></i> Try again';
+            return;
         }
 
-        async function createKey() {
-            if (keyGenerated) return;
-            document.getElementById("genBtn").disabled = true;
+        generatedKey = key;
+        if (timerInterval) clearInterval(timerInterval);
+        setStatus('statusGenerate', '<i class="ti ti-check"></i> Key generated successfully! Closing in 10 seconds...', 'success');
+        btn.style.display = 'none';
+        document.getElementById('timerText').innerText = '';
+        document.getElementById('timerBar').style.width = '0%';
 
-            const key = generateKey();
-            const expiresAt = new Date();
-            expiresAt.setHours(expiresAt.getHours() + 24);
+        // Show key
+        setTimeout(function() {
+            document.getElementById('keyDisplay').innerText = key;
+            showView('viewKeyValid');
+        }, 1500);
 
-            const { data, error } = await client
-                .from("keys")
-                .insert([{ key: key, expires_at: expiresAt.toISOString() }])
-                .select();
+        // Close after 10s
+        setTimeout(function() {
+            closeModal();
+            window.location.href = "https://work.ink/2Cxd/key-systeme";
+        }, 10000);
+    }
 
-            if (error) {
-                alert(error.message);
-                document.getElementById("genBtn").disabled = false;
-                return;
+    function startTimer() {
+        timeLeft = 300;
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(function() {
+            timeLeft--;
+            const min = Math.floor(timeLeft / 60);
+            const sec = timeLeft % 60;
+            const secStr = sec < 10 ? '0' + sec : sec;
+            document.getElementById('timerText').innerText = min + ':' + secStr + ' remaining';
+            document.getElementById('timerBar').style.width = ((timeLeft / 300) * 100) + '%';
+
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                document.getElementById('generateBtn').style.display = 'none';
+                setStatus('statusGenerate', '<i class="ti ti-clock-off"></i> Time expired. Please pass the checkpoint again.', 'error');
+                document.getElementById('timerText').innerText = '';
+                setTimeout(function() {
+                    window.location.href = "https://work.ink/2Cxd/key-systeme";
+                }, 3000);
             }
+        }, 1000);
+    }
 
-            keyGenerated = true;
-            document.getElementById("key").innerText = "Clé : " + key + " | Expire dans 24h";
-            document.getElementById("genBtn").style.display = "none";
-            document.getElementById("status").innerText = "✅ Clé générée ! La page se ferme dans 10 secondes.";
-            document.getElementById("timer").innerText = "";
+    function copyKey() {
+        const key = document.getElementById('keyDisplay').innerText;
+        navigator.clipboard.writeText(key).then(function() {
+            const el = document.getElementById('keyDisplay');
+            el.innerText = 'Copied!';
+            setTimeout(function() { el.innerText = key; }, 1500);
+        });
+    }
 
-            setTimeout(function() {
-                window.close();
-                window.location.href = "https://work.ink/2Cxd/key-systeme";
-            }, 10000);
-        }
-    </script>
+    // Close modal on overlay click
+    document.getElementById('modalOverlay').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
+</script>
+
 </body>
 </html>
+EOF
+echo "Done"
