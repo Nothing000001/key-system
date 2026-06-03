@@ -4,59 +4,92 @@
     <title>Key System</title>
 </head>
 <body>
-<h1>Générateur de clé</h1>
-<p id="status">Vérification...</p>
-<button id="genBtn" style="display:none" onclick="createKey()">Générer une clé</button>
-<p id="key"></p>
+    <h1>Générateur de clé</h1>
+    <p id="status">Vérification...</p>
+    <button id="genBtn" style="display:none" onclick="createKey()">Générer une clé</button>
+    <p id="key"></p>
+    <p id="timer"></p>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-<script>
-const supabaseUrl = "https://pzdodoygspssikcpvvrq.supabase.co";
-const supabaseKey = "sb_publishable_rVdhmCr_Y815IhWnOJxjCw_rZIpiX0H";
-const client = supabase.createClient(supabaseUrl, supabaseKey);
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script>
+        const supabaseUrl = "https://pzdodoygspssikcpvvrq.supabase.co";
+        const supabaseKey = "sb_publishable_rVdhmCr_Y815IhWnOJxjCw_rZIpiX0H";
+        const client = supabase.createClient(supabaseUrl, supabaseKey);
 
-// Vérifie si vient de work.ink
-const referrer = document.referrer;
-const allowed = referrer.includes("work.ink") || referrer.includes("loot-link.com");
+        const referrer = document.referrer;
+        const allowed = referrer.includes("work.ink") || referrer.includes("loot-link.com");
+        let keyGenerated = false;
 
-if (!allowed) {
-    document.getElementById("status").innerText = "❌ Tu dois passer par le lien officiel !";
-    setTimeout(function() {
-        window.location.href = "https://work.ink/2Cxd/key-systeme";
-    }, 3000);
-} else {
-    document.getElementById("status").innerText = "✅ Accès autorisé !";
-    document.getElementById("genBtn").style.display = "block";
-}
+        if (!allowed) {
+            document.getElementById("status").innerText = "❌ Tu dois passer par le lien officiel !";
+            setTimeout(function() {
+                window.location.href = "https://work.ink/2Cxd/key-systeme";
+            }, 3000);
+        } else {
+            document.getElementById("status").innerText = "✅ Accès autorisé ! Tu as 5 minutes.";
+            document.getElementById("genBtn").style.display = "block";
 
-function generateKey() {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    let key = "";
-    for (let i = 0; i < 16; i++) {
-        if (i > 0 && i % 4 === 0) key += "-";
-        key += chars[Math.floor(Math.random() * chars.length)];
-    }
-    return key;
-}
+            let timeLeft = 300;
+            const countdown = setInterval(function() {
+                timeLeft--;
+                const min = Math.floor(timeLeft / 60);
+                const sec = timeLeft % 60;
+                document.getElementById("timer").innerText = "⏳ Temps restant : " + min + "m " + sec + "s";
 
-async function createKey() {
-    const key = generateKey();
-    const expiresAt = new Date();
-    expiresAt.setHours(expiresAt.getHours() + 24);
+                if (timeLeft <= 0) {
+                    clearInterval(countdown);
+                    if (!keyGenerated) {
+                        document.getElementById("genBtn").style.display = "none";
+                        document.getElementById("status").innerText = "❌ Temps écoulé ! Repasse par le lien officiel.";
+                        document.getElementById("timer").innerText = "";
+                        setTimeout(function() {
+                            window.location.href = "https://work.ink/2Cxd/key-systeme";
+                        }, 3000);
+                    }
+                }
+            }, 1000);
+        }
 
-    const { data, error } = await client
-        .from("keys")
-        .insert([{ key: key, expires_at: expiresAt.toISOString() }])
-        .select();
+        function generateKey() {
+            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            let key = "";
+            for (let i = 0; i < 16; i++) {
+                if (i > 0 && i % 4 === 0) key += "-";
+                key += chars[Math.floor(Math.random() * chars.length)];
+            }
+            return key;
+        }
 
-    if (error) {
-        alert(error.message);
-        return;
-    }
+        async function createKey() {
+            if (keyGenerated) return;
+            document.getElementById("genBtn").disabled = true;
 
-    document.getElementById("key").innerText = "Clé : " + key + " | Expire dans 24h";
-    document.getElementById("genBtn").style.display = "none";
-}
-</script>
+            const key = generateKey();
+            const expiresAt = new Date();
+            expiresAt.setHours(expiresAt.getHours() + 24);
+
+            const { data, error } = await client
+                .from("keys")
+                .insert([{ key: key, expires_at: expiresAt.toISOString() }])
+                .select();
+
+            if (error) {
+                alert(error.message);
+                document.getElementById("genBtn").disabled = false;
+                return;
+            }
+
+            keyGenerated = true;
+            document.getElementById("key").innerText = "Clé : " + key + " | Expire dans 24h";
+            document.getElementById("genBtn").style.display = "none";
+            document.getElementById("status").innerText = "✅ Clé générée ! La page se ferme dans 10 secondes.";
+            document.getElementById("timer").innerText = "";
+
+            setTimeout(function() {
+                window.close();
+                window.location.href = "https://work.ink/2Cxd/key-systeme";
+            }, 10000);
+        }
+    </script>
 </body>
 </html>
