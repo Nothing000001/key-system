@@ -1,1 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WAN HUB - Scripts</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #0a0a0a; color: #e8e8e8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+        a { text-decoration: none; }
 
+        /* NAV */
+        .nav { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 2.5rem; border-bottom: 0.5px solid #222; position: sticky; top: 0; background: #0a0a0a; z-index: 100; }
+        .nav-logo { font-size: 18px; font-weight: 500; color: #fff; letter-spacing: -0.3px; }
+        .nav-logo span { color: #7F77DD; }
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a { font-size: 14px; color: #999; transition: color 0.2s; }
+        .nav-links a:hover, .nav-links a.active { color: #fff; }
+        .nav-btn { background: #7F77DD; color: #fff; border: none; padding: 8px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; }
+        .nav-btn:hover { background: #6b63c7; }
+
+        /* PAGE HEADER */
+        .page-header { padding: 3rem 2.5rem 2rem; border-bottom: 0.5px solid #1a1a1a; }
+        .page-header-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; flex-wrap: wrap; }
+        .page-title-block {}
+        .badge { display: inline-flex; align-items: center; gap: 6px; background: #1a1a2e; border: 0.5px solid #3C3489; color: #AFA9EC; font-size: 12px; padding: 5px 12px; border-radius: 20px; margin-bottom: 1rem; }
+        .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: #7F77DD; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+        .page-title { font-size: 36px; font-weight: 500; color: #fff; letter-spacing: -0.5px; }
+        .page-title span { color: #7F77DD; }
+        .page-sub { font-size: 14px; color: #555; margin-top: 0.5rem; }
+        .stats-row { display: flex; gap: 2rem; }
+        .stat { text-align: right; }
+        .stat-val { font-size: 22px; font-weight: 500; color: #fff; }
+        .stat-val span { color: #7F77DD; }
+        .stat-label { font-size: 11px; color: #444; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* FILTERS */
+        .filters-bar { padding: 1.25rem 2.5rem; border-bottom: 0.5px solid #1a1a1a; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+        .filters-bar-inner { max-width: 1200px; margin: 0 auto; width: 100%; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+        .filter-btn { background: #111; border: 0.5px solid #222; color: #888; padding: 7px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s; }
+        .filter-btn:hover { border-color: #444; color: #ccc; }
+        .filter-btn.active { background: #1a1a2e; border-color: #3C3489; color: #AFA9EC; }
+        .filter-sep { width: 0.5px; height: 20px; background: #222; margin: 0 0.25rem; }
+        .sort-select { background: #111; border: 0.5px solid #222; color: #888; padding: 7px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; outline: none; margin-left: auto; }
+        .sort-select:focus { border-color: #7F77DD; color: #fff; }
+        .search-wrap { position: relative; flex: 1; max-width: 280px; }
+        .search-wrap i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #444; font-size: 15px; }
+        .search-input { width: 100%; background: #111; border: 0.5px solid #222; color: #e8e8e8; padding: 7px 14px 7px 34px; border-radius: 20px; font-size: 13px; outline: none; }
+        .search-input:focus { border-color: #7F77DD; }
+        .search-input::placeholder { color: #444; }
+
+        /* SCRIPTS GRID */
+        .scripts-section { padding: 2rem 2.5rem; max-width: 1200px; margin: 0 auto; }
+        .scripts-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: #141414; border: 1px solid #141414; border-radius: 12px; overflow: hidden; }
+
+        /* SCRIPT CARD */
+        .script-card { background: #0a0a0a; padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem; cursor: pointer; transition: background 0.2s; position: relative; }
+        .script-card:hover { background: #0f0f0f; }
+        .script-thumb { width: 100%; aspect-ratio: 16/9; border-radius: 8px; background: #111; border: 0.5px solid #1a1a1a; overflow: hidden; position: relative; display: flex; align-items: center; justify-content: center; }
+        .script-thumb-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: #2a2a2a; }
+        .script-thumb-img { width: 100%; height: 100%; object-fit: cover; }
+        .thumb-badge { position: absolute; top: 7px; left: 7px; background: #7F77DD; color: #fff; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 4px; letter-spacing: 0.5px; }
+        .thumb-badge.new { background: #7F77DD; }
+        .thumb-badge.free { background: #2a5a2a; color: #97C459; border: 0.5px solid #1A5A1A; }
+        .thumb-badge.keysys { background: #1a1a2e; color: #AFA9EC; border: 0.5px solid #3C3489; }
+        .thumb-views { position: absolute; top: 7px; right: 7px; background: rgba(0,0,0,0.7); color: #aaa; font-size: 10px; padding: 2px 7px; border-radius: 4px; display: flex; align-items: center; gap: 4px; }
+        .thumb-time { position: absolute; bottom: 7px; right: 7px; background: rgba(0,0,0,0.7); color: #666; font-size: 10px; padding: 2px 7px; border-radius: 4px; }
+
+        .script-game-tag { display: inline-flex; align-items: center; gap: 5px; background: #111; border: 0.5px solid #1a1a1a; color: #666; font-size: 11px; padding: 3px 10px; border-radius: 4px; width: fit-content; }
+        .script-title { font-size: 13px; font-weight: 500; color: #ddd; line-height: 1.4; }
+        .script-author { font-size: 12px; color: #444; display: flex; align-items: center; gap: 5px; }
+        .author-dot { width: 16px; height: 16px; border-radius: 50%; background: #1a1a2e; border: 0.5px solid #3C3489; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #7F77DD; }
+        .script-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 0.5rem; border-top: 0.5px solid #111; }
+        .script-footer-tags { display: flex; gap: 4px; }
+        .tag { font-size: 10px; padding: 2px 6px; border-radius: 3px; }
+        .tag-nokey { background: #0f1a0f; color: #97C459; border: 0.5px solid #1A5A1A; }
+        .tag-key { background: #1a1a2e; color: #AFA9EC; border: 0.5px solid #3C3489; }
+        .tag-undetected { background: #1a0f0f; color: #f09595; border: 0.5px solid #5A1A1A; }
+        .copy-btn { background: none; border: 0.5px solid #222; color: #555; padding: 4px 10px; border-radius: 4px; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s; }
+        .copy-btn:hover { border-color: #7F77DD; color: #7F77DD; }
+
+        /* EMPTY STATE */
+        .empty-state { grid-column: 1 / -1; padding: 5rem 2rem; text-align: center; color: #333; }
+        .empty-state i { font-size: 48px; margin-bottom: 1rem; display: block; }
+        .empty-state p { font-size: 14px; }
+
+        /* ADD SCRIPT CARD */
+        .add-card { background: #0a0a0a; border: 1px dashed #1a1a1a; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.75rem; cursor: pointer; padding: 2rem; min-height: 200px; transition: all 0.2s; }
+        .add-card:hover { border-color: #7F77DD; background: #0d0d18; }
+        .add-card i { font-size: 28px; color: #2a2a2a; transition: color 0.2s; }
+        .add-card:hover i { color: #7F77DD; }
+        .add-card span { font-size: 13px; color: #333; transition: color 0.2s; }
+        .add-card:hover span { color: #7F77DD; }
+
+        /* FOOTER */
+        .footer { padding: 2rem 2.5rem; border-top: 0.5px solid #1a1a1a; display: flex; justify-content: space-between; align-items: center; margin-top: 3rem; }
+        .footer p { font-size: 12px; color: #444; }
+
+        /* MODAL SCRIPT */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: #111; border: 0.5px solid #2a2a2a; border-radius: 16px; padding: 2rem; width: 100%; max-width: 520px; position: relative; }
+        .modal-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: #555; font-size: 20px; cursor: pointer; }
+        .modal-close:hover { color: #fff; }
+        .modal h2 { font-size: 18px; font-weight: 500; color: #fff; margin-bottom: 0.5rem; }
+        .modal-sub { font-size: 13px; color: #555; margin-bottom: 1.5rem; }
+        .modal-game-tag { display: inline-flex; align-items: center; gap: 5px; background: #0a0a0a; border: 0.5px solid #1a1a1a; color: #666; font-size: 11px; padding: 3px 10px; border-radius: 4px; margin-bottom: 1rem; }
+        .script-box { background: #0a0a0a; border: 0.5px solid #2a2a2a; border-radius: 8px; padding: 1rem; font-family: 'Courier New', monospace; font-size: 12px; color: #7F77DD; line-height: 1.7; word-break: break-all; max-height: 160px; overflow-y: auto; margin-bottom: 1rem; }
+        .modal-actions { display: flex; gap: 0.75rem; }
+        .btn-primary { background: #7F77DD; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-primary:hover { background: #6b63c7; }
+        .btn-outline { background: transparent; color: #888; border: 0.5px solid #2a2a2a; padding: 10px 20px; border-radius: 8px; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .btn-outline:hover { background: #1a1a1a; color: #fff; }
+        .modal-status { font-size: 13px; padding: 8px 12px; border-radius: 6px; margin-bottom: 1rem; }
+        .modal-status.success { background: #0f1a0f; border: 0.5px solid #1A5A1A; color: #97C459; }
+
+        @media (max-width: 1100px) { .scripts-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 768px) {
+            .scripts-grid { grid-template-columns: repeat(2, 1fr); }
+            .nav-links { display: none; }
+            .stats-row { display: none; }
+            .page-title { font-size: 26px; }
+        }
+        @media (max-width: 480px) { .scripts-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="nav">
+    <div class="nav-logo">WAN<span>HUB</span></div>
+    <div class="nav-links">
+        <a href="index.html">Key System</a>
+        <a href="scripts.html" class="active">Scripts</a>
+        <a href="#how-it-works">How it works</a>
+    </div>
+    <button class="nav-btn" onclick="window.location.href='index.html'">Get a key</button>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+    <div class="page-header-inner">
+        <div class="page-title-block">
+            <div class="badge"><span class="badge-dot"></span> Updated regularly</div>
+            <div class="page-title">Script <span>library</span></div>
+            <p class="page-sub">Browse and copy scripts — all protected by the WAN HUB key system.</p>
+        </div>
+        <div class="stats-row">
+            <div class="stat">
+                <div class="stat-val" id="statScripts">0</div>
+                <div class="stat-label">Scripts</div>
+            </div>
+            <div class="stat">
+                <div class="stat-val">24<span>h</span></div>
+                <div class="stat-label">Key validity</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FILTERS -->
+<div class="filters-bar">
+    <div class="filters-bar-inner">
+        <button class="filter-btn active" onclick="setFilter('all', this)"><i class="ti ti-layout-grid"></i> All</button>
+        <button class="filter-btn" onclick="setFilter('free', this)"><i class="ti ti-lock-open"></i> No keysystem</button>
+        <button class="filter-btn" onclick="setFilter('key', this)"><i class="ti ti-key"></i> Key required</button>
+        <div class="filter-sep"></div>
+        <div class="search-wrap">
+            <i class="ti ti-search"></i>
+            <input class="search-input" type="text" placeholder="Search scripts..." oninput="renderScripts()" id="searchInput" />
+        </div>
+        <select class="sort-select" onchange="renderScripts()" id="sortSelect">
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+            <option value="views">Most viewed</option>
+        </select>
+    </div>
+</div>
+
+<!-- SCRIPTS -->
+<div class="scripts-section">
+    <div class="scripts-grid" id="scriptsGrid">
+        <!-- Cards rendered by JS -->
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <p>WAN HUB Scripts</p>
+    <p>Protected by WAN HUB Key System</p>
+</footer>
+
+<!-- SCRIPT MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+        <button class="modal-close" onclick="closeModal()"><i class="ti ti-x"></i></button>
+        <div class="modal-game-tag" id="modalGame"></div>
+        <h2 id="modalTitle"></h2>
+        <p class="modal-sub" id="modalDesc"></p>
+        <div class="script-box" id="modalScript"></div>
+        <div class="modal-status success" id="modalCopyStatus" style="display:none"><i class="ti ti-check"></i> Copied to clipboard!</div>
+        <div class="modal-actions">
+            <button class="btn-primary" onclick="copyModalScript()"><i class="ti ti-copy"></i> Copy script</button>
+            <button class="btn-outline" onclick="closeModal()"><i class="ti ti-x"></i> Close</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // =============================================
+    // SCRIPTS DATA — add your scripts here
+    // =============================================
+    const SCRIPTS = [
+        // Example structure (remove or replace with your own):
+        // {
+        //   id: 1,
+        //   title: "Script Name",
+        //   game: "Game Name",
+        //   desc: "Short description of what the script does.",
+        //   script: `loadstring(game:HttpGet("https://yourlink.com"))()`,
+        //   keysystem: true,   // true = key required, false = no keysystem
+        //   views: 100,
+        //   time: "1h ago",
+        //   badge: "NEW",      // "NEW", "FREE", or ""
+        //   icon: "ti-code"    // tabler icon name for placeholder
+        // },
+    ];
+    // =============================================
+
+    let activeFilter = 'all';
+
+    function setFilter(f, btn) {
+        activeFilter = f;
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderScripts();
+    }
+
+    function renderScripts() {
+        const grid = document.getElementById('scriptsGrid');
+        const search = document.getElementById('searchInput').value.toLowerCase();
+        const sort = document.getElementById('sortSelect').value;
+
+        let filtered = SCRIPTS.filter(s => {
+            if (activeFilter === 'free' && s.keysystem) return false;
+            if (activeFilter === 'key' && !s.keysystem) return false;
+            if (search && !s.title.toLowerCase().includes(search) && !s.game.toLowerCase().includes(search)) return false;
+            return true;
+        });
+
+        if (sort === 'views') filtered.sort((a,b) => b.views - a.views);
+        else if (sort === 'oldest') filtered.sort((a,b) => a.id - b.id);
+        else filtered.sort((a,b) => b.id - a.id);
+
+        document.getElementById('statScripts').textContent = SCRIPTS.length;
+
+        if (filtered.length === 0) {
+            grid.innerHTML = `
+                <div class="empty-state">
+                    <i class="ti ti-file-off"></i>
+                    <p>No scripts yet — check back soon.</p>
+                </div>
+            `;
+            return;
+        }
+
+        grid.innerHTML = filtered.map(s => `
+            <div class="script-card" onclick="openScript(${s.id})">
+                <div class="script-thumb">
+                    <div class="script-thumb-placeholder"><i class="ti ${s.icon || 'ti-code'}"></i></div>
+                    ${s.badge ? `<div class="thumb-badge ${s.badge.toLowerCase()}">${s.badge}</div>` : ''}
+                    <div class="thumb-views"><i class="ti ti-eye" style="font-size:10px"></i> ${s.views}</div>
+                    <div class="thumb-time">${s.time}</div>
+                </div>
+                <div class="script-game-tag"><i class="ti ti-device-gamepad-2" style="font-size:11px"></i> ${s.game}</div>
+                <div class="script-title">${s.title}</div>
+                <div class="script-author"><div class="author-dot"><i class="ti ti-user" style="font-size:8px"></i></div> @WanHub</div>
+                <div class="script-footer">
+                    <div class="script-footer-tags">
+                        ${s.keysystem ? '<span class="tag tag-key">Key</span>' : '<span class="tag tag-nokey">No key</span>'}
+                    </div>
+                    <button class="copy-btn" onclick="event.stopPropagation(); quickCopy(${s.id}, this)">
+                        <i class="ti ti-copy"></i> Copy
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function openScript(id) {
+        const s = SCRIPTS.find(x => x.id === id);
+        if (!s) return;
+        document.getElementById('modalGame').innerHTML = `<i class="ti ti-device-gamepad-2" style="font-size:11px"></i> ${s.game}`;
+        document.getElementById('modalTitle').textContent = s.title;
+        document.getElementById('modalDesc').textContent = s.desc;
+        document.getElementById('modalScript').textContent = s.script;
+        document.getElementById('modalCopyStatus').style.display = 'none';
+        document.getElementById('modalOverlay').classList.add('active');
+        window._currentScript = s.script;
+    }
+
+    function closeModal() {
+        document.getElementById('modalOverlay').classList.remove('active');
+    }
+
+    function copyModalScript() {
+        navigator.clipboard.writeText(window._currentScript || '').then(() => {
+            const el = document.getElementById('modalCopyStatus');
+            el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 2000);
+        });
+    }
+
+    function quickCopy(id, btn) {
+        const s = SCRIPTS.find(x => x.id === id);
+        if (!s) return;
+        navigator.clipboard.writeText(s.script).then(() => {
+            const orig = btn.innerHTML;
+            btn.innerHTML = '<i class="ti ti-check"></i> Copied';
+            btn.style.borderColor = '#7F77DD';
+            btn.style.color = '#7F77DD';
+            setTimeout(() => {
+                btn.innerHTML = orig;
+                btn.style.borderColor = '';
+                btn.style.color = '';
+            }, 1500);
+        });
+    }
+
+    document.getElementById('modalOverlay').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
+
+    renderScripts();
+</script>
+
+</body>
+</html>
