@@ -128,7 +128,6 @@
 </head>
 <body>
 
-<!-- NAVBAR -->
 <nav class="nav">
     <div class="nav-logo">WAN<span>HUB</span></div>
     <div class="nav-links">
@@ -139,7 +138,6 @@
     <button class="nav-btn" onclick="window.location.href='index.html'">Get a key</button>
 </nav>
 
-<!-- PAGE HEADER -->
 <div class="page-header">
     <div class="page-header-inner">
         <div class="page-title-block">
@@ -160,7 +158,6 @@
     </div>
 </div>
 
-<!-- FILTERS -->
 <div class="filters-bar">
     <div class="filters-bar-inner">
         <button class="filter-btn active" onclick="setFilter('all', this)"><i class="ti ti-layout-grid"></i> All</button>
@@ -179,20 +176,16 @@
     </div>
 </div>
 
-<!-- SCRIPTS -->
 <div class="scripts-section">
     <div class="scripts-grid" id="scriptsGrid">
-        <!-- Cards rendered by JS -->
-    </div>
+        </div>
 </div>
 
-<!-- FOOTER -->
 <footer class="footer">
     <p>WAN HUB Scripts</p>
     <p>Protected by WAN HUB Key System</p>
 </footer>
 
-<!-- SCRIPT MODAL -->
 <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
         <button class="modal-close" onclick="closeModal()"><i class="ti ti-x"></i></button>
@@ -223,7 +216,8 @@
             views: 0,
             time: "1h ago",
             badge: "NEW",
-            icon: "ti-sword"
+            // J'ai ajouté l'URL directe de l'image ici :
+            image: "https://tr.rbxcdn.com/180DAY-5f7d7ce1acc4865b58798ba68b8addcf/500/280/Image/Jpeg/noFilter" 
         },
     ];
     // =============================================
@@ -250,8 +244,8 @@
         });
 
         if (sort === 'views') filtered.sort((a,b) => b.views - a.views);
-        else if (sort === 'oldest') filtered.sort((a,b) => a.id - b.id);
-        else filtered.sort((a,b) => b.id - a.id);
+            else if (sort === 'oldest') filtered.sort((a,b) => a.id - b.id);
+            else filtered.sort((a,b) => b.id - a.id);
 
         document.getElementById('statScripts').textContent = SCRIPTS.length;
 
@@ -265,10 +259,14 @@
             return;
         }
 
+        // Modification ici pour afficher l'image réelle si 's.image' existe, sinon mettre l'icône par défaut
         grid.innerHTML = filtered.map(s => `
             <div class="script-card" onclick="openScript(${s.id})">
                 <div class="script-thumb">
-                    <div class="script-thumb-placeholder"><i class="ti ${s.icon || 'ti-code'}"></i></div>
+                    ${s.image ? 
+                        `<img src="${s.image}" class="script-thumb-img" alt="${s.title}">` : 
+                        `<div class="script-thumb-placeholder"><i class="ti ${s.icon || 'ti-code'}"></i></div>`
+                    }
                     ${s.badge ? `<div class="thumb-badge ${s.badge.toLowerCase()}">${s.badge}</div>` : ''}
                     <div class="thumb-views"><i class="ti ti-eye" style="font-size:10px"></i> ${s.views}</div>
                     <div class="thumb-time">${s.time}</div>
