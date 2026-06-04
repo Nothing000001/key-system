@@ -255,23 +255,6 @@
                 <a href="https://work.ink/2Cxd/key-systeme" target="_blank" style="width:100%">
                     <button class="btn-primary" style="width:100%; justify-content:center;"><i class="ti ti-external-link"></i> Go to checkpoint to get a key</button>
                 </a>
-                <div class="modal-divider"><span>already have a key?</span></div>
-                <button class="btn-outline" onclick="showView('viewEnterKey')"><i class="ti ti-keyboard"></i> Enter my key</button>
-            </div>
-        </div>
-
-        <!-- VIEW: ENTER KEY -->
-        <div id="viewEnterKey" style="display:none">
-            <h2>Enter your key</h2>
-            <p class="modal-sub">Paste the key you generated from the checkpoint link below.</p>
-            <div class="modal-status" id="statusEnterKey"></div>
-            <div class="input-group">
-                <label>Your key</label>
-                <input type="text" id="keyInput" placeholder="XXXX-XXXX-XXXX-XXXX" maxlength="19" oninput="formatKeyInput(this)" />
-            </div>
-            <div class="modal-actions">
-                <button class="btn-primary" onclick="verifyKey()"><i class="ti ti-shield-check"></i> Verify key</button>
-                <button class="btn-outline" onclick="showView('viewGetKey')"><i class="ti ti-arrow-left"></i> Back</button>
             </div>
         </div>
 
